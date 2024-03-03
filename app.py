@@ -7,6 +7,10 @@ import ffmpeg
 from math import ceil
 
 s3 = boto3.client('s3')
+dest_bucket = os.environ.get('DEST_BUCKET')
+part_duration = float(os.environ.get('PART_DURATION'))
+silence_duration = float(os.environ.get('SILENCE_DURATION'))
+silence_threshold = os.environ.get('SILENCE_THRESH')
 
 def handler(event, context):
     print('## EVENT')
@@ -21,14 +25,15 @@ def handler(event, context):
         s3.download_file(bucket, key, audio_file)
         audio_info = ffmpeg.probe(audio_file)
         dur = float(audio_info['format']['duration'])
-        # 7:30 seems like a reasonable figure to shoot for
-        parts = ceil(dur / 450.0)
-        split_files = split.split_audio_into_chunks(audio_file, parts, "-20dB", 1.0)
+        # using 7:30 target for part length to start, adjust in function env vars (use number of seconds)
+        parts = ceil(dur / part_duration) 
+        # set silence_threshold and duration in function env vars, -20dB and 1.0 (in sec) seem to work well
+        split_files = split.split_audio_into_chunks(audio_file, parts, silence_threshold, silence_duration)
         print(f'split audio into {parts} parts')
         for this_f in split_files:
             with open(this_f,mode='rb') as f:
                 f_name = os.path.basename(this_f)
-                s3.put_object(Bucket='stubbs-parts', Key=f'{prefix}/{f_name}', Body=f)
+                s3.put_object(Bucket=dest_bucket, Key=f'{prefix}/{f_name}', Body=f)
                 print(f'copied {this_f} to s3://stubbs-parts/{prefix}/{f_name}')
             os.remove(this_f)
         os.remove(audio_file)
