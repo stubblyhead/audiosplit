@@ -160,6 +160,6 @@ cython_debug/
 #.idea/
 
 # Audio files
-.mp3
-.m4a
-.flac
+*.mp3
+*.m4a
+*.flac
