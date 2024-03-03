@@ -6,6 +6,8 @@ import os
 import ffmpeg
 from math import ceil
 
+s3 = boto3.client('s3')
+
 def handler(event, context):
     print('## EVENT')
     print(event)
@@ -24,14 +26,14 @@ def handler(event, context):
         split_files = split.split_audio_into_chunks(audio_file, parts, "-40dB", 1.0)
         print(f'split audio into {parts} parts')
         for this_f in split_files:
-            with open('this_f',mode='b') as f:
+            with open(this_f,mode='rb') as f:
                 f_name = os.path.basename(this_f)
-                s3.put_object(Bucket='stubbs-parts', Key=f'{prefix}/{f_name}', f)
+                s3.put_object(Bucket='stubbs-parts', Key=f'{prefix}/{f_name}', Body=f)
                 print(f'copied {this_f} to s3://stubbs-parts/{prefix}/{f_name}')
             os.remove(this_f)
         os.remove(audio_file)
         s3.delete_object(bucket, key)
-        print(f'finished splitting {key}, removed temp files'}
+        print(f'finished splitting {key}, removed temp files')
         return { "statusCode": 200, "body": f"{audio_file} split up" }
     except Exception as e:
         print(e)
