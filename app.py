@@ -23,7 +23,7 @@ def handler(event, context):
         dur = float(audio_info['format']['duration'])
         # 7:30 seems like a reasonable figure to shoot for
         parts = ceil(dur / 450.0)
-        split_files = split.split_audio_into_chunks(audio_file, parts, "-40dB", 1.0)
+        split_files = split.split_audio_into_chunks(audio_file, parts, "-20dB", 1.0)
         print(f'split audio into {parts} parts')
         for this_f in split_files:
             with open(this_f,mode='rb') as f:
