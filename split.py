@@ -76,8 +76,7 @@ def split_audio_into_chunks(input_file: str, max_chunks: int,
     temp_files = []
     current_chunk_start = 0.0
 
-    n = max_chunks
-    selected_items = find_optimal_breakpoints(silence_starts, n)
+    selected_items = find_optimal_breakpoints(silence_starts, max_chunks-1)
     selected_items.append(duration)
 
     for j in range(0, len(selected_items)):
