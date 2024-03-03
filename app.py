@@ -32,7 +32,8 @@ def handler(event, context):
                 print(f'copied {this_f} to s3://stubbs-parts/{prefix}/{f_name}')
             os.remove(this_f)
         os.remove(audio_file)
-        s3.delete_object(bucket, key)
+        # will need to update policy to delete input object, not sure if we want to do this though
+        # s3.delete_object(Bucket=bucket, Key=key)
         print(f'finished splitting {key}, removed temp files')
         return { "statusCode": 200, "body": f"{audio_file} split up" }
     except Exception as e:
