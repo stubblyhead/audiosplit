@@ -24,7 +24,11 @@ def handler(event, context):
         print(f'saving object to {audio_file}')
         s3.download_file(bucket, key, audio_file)
         audio_info = ffmpeg.probe(audio_file)
-        dur = float(audio_info['format']['duration'])
+        if 'format' in audio_info.keys() and 'duration' in audio_info['format'].keys():
+            dur = float(audio_info['format']['duration'])
+        else:
+            #ffprobe can't determine duration sometimes; assume half hour in that case (1800 sec)
+            dur = 1800
         # using 7:30 target for part length to start, adjust in function env vars (use number of seconds)
         parts = ceil(dur / part_duration) 
         # set silence_threshold and duration in function env vars, -20dB and 1.0 (in sec) seem to work well
