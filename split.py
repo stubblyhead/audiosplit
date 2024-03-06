@@ -21,6 +21,9 @@ def find_optimal_breakpoints(points: List[float], n: int) -> List[float]:
         temp = i
         if len(result) == n-1:
             break
+    # 0 is never an optimal breakpoint
+    while result.count(0) > 0:
+        result.remove(0)
     return result
 
 def save_chunk_to_temp_file(input_file: str, start: float, end: float, idx: int) -> str:
@@ -56,6 +59,9 @@ def get_silence_starts(input_file: str, silence_threshold: float, silence_durati
             silence_start = silence_end - silence_dur
             silence_starts.append(silence_start)
 
+    # silence_start value of 0 causes problems later, so we'll remove those now if they exist
+    while silence_starts.count(0) > 0:
+        silence_starts.remove(0)
     return silence_starts
 
 
