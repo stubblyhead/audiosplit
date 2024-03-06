@@ -38,7 +38,7 @@ def handler(event, context):
             with open(this_f,mode='rb') as f:
                 f_name = os.path.basename(this_f)
                 s3.put_object(Bucket=dest_bucket, Key=f'{prefix}/{f_name}', Body=f)
-                print(f'copied {this_f} to s3://stubbs-parts/{prefix}/{f_name}')
+                print(f'copied {this_f} to s3://{dest_bucket}/{prefix}/{f_name}')
             os.remove(this_f)
         os.remove(audio_file)
         # will need to update policy to delete input object, not sure if we want to do this though
