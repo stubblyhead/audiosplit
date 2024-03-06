@@ -32,6 +32,7 @@ def split_audio_into_chunks(input_file: str, max_chunks: int,
         in_stream = ffmpeg.input(input_file)
         (
             ffmpeg.output(in_stream, temp_file, ss=start, t=end - start, c="copy")
+            .global_args('-hide_banner')
             .overwrite_output()
             .run()
         )
@@ -45,6 +46,7 @@ def split_audio_into_chunks(input_file: str, max_chunks: int,
             ffmpeg.input(input_file)
             .filter("silencedetect", n=silence_threshold, d=str(silence_duration))
             .output("pipe:", format="null")
+            .global_args('-hide_banner')
             .run_async(pipe_stderr=True)
         )
 
